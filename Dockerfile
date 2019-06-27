@@ -1,4 +1,10 @@
-FROM adoptopenjdk/openjdk11-openj9:jdk-11.0.1.13-alpine-slim
-COPY build/libs/*.jar micronautdemo2.jar
+FROM oracle/graalvm-ce:19.0.0 as graalvm
+COPY . /home/app/micronautdemo2
+WORKDIR /home/app/micronautdemo2
+RUN gu install native-image
+RUN native-image --no-server -cp build/libs/micronautdemo2-*.jar
+
+FROM frolvlad/alpine-glibc
 EXPOSE 8080
-CMD java  -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dcom.sun.management.jmxremote -noverify ${JAVA_OPTS} -jar micronautdemo2.jar
+COPY --from=graalvm /home/app/micronautdemo2 .
+ENTRYPOINT ["./micronautdemo2"]

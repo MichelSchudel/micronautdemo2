@@ -31,3 +31,6 @@ endpoints:
     sensitive: false
   health:
     details-visible: ANONYMOUS
+  routes:
+    enabled: true
+    sensitive: false
